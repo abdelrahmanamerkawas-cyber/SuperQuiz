@@ -18,12 +18,14 @@ button { margin: 6px; padding: 15px; border: none; border-radius: 8px; cursor: p
 .progressFill { height: 100%; background: #f2c80f; width: 0%; border-radius: 8px; transition: width 0.5s;}
 .firework { position: absolute; width: 10px; height: 10px; border-radius: 50%; animation: explode 0.8s forwards; }
 @keyframes explode { 0% { transform: scale(1); opacity:1;} 100% { transform: scale(3); opacity:0;} }
-table { width: 90%; margin: 10px auto; border-collapse: collapse; color:white; }
-th, td { border: 1px solid white; padding: 8px; }
-th#th1 { background: #e21b3c; }   /* Player 1 red */
-th#th2 { background: #1368ce; }   /* Player 2 blue */
-#leaderboardBody tr:nth-child(odd) { background: rgba(255,255,255,0.1); }
-#leaderboardBody tr:nth-child(even){ background: rgba(255,255,255,0.2); }
+ 
+/* Leaderboard styling */
+table { width: 90%; margin: 10px auto; border-collapse: collapse; color:white; border-radius:8px; overflow:hidden; }
+th, td { padding: 8px; text-align: center; }
+thead { background: #7b3de1; }       /* Dark purple header */
+tbody tr:nth-child(odd) { background: #5c2aa0; }  /* Light purple odd rows */
+tbody tr:nth-child(even){ background: #6b32c1; }  /* Darker purple even rows */
+tfoot { background: #7b3de1; font-weight: bold; } /* Footer for totals */
 </style>
 </head>
 <body>
@@ -81,13 +83,13 @@ let p1="", p2="", botDiff="normal";
 let level=1, index=0, turn=1, timerValue=10, timer;
 let score={1:0,2:0}, levelScores=[], questions=[];
  
-// Questions per level (increasing difficulty)
+// Questions per level (harder per level)
 const levels = {
-  1: [ {q:"2 + 2 = ?", o:["3","4","5","6"], a:"4"}, {q:"Water freezes at ?", o:["0°C","10°C","100°C","50°C"], a:"0°C"}, {q:"1 + 3 = ?", o:["3","4","5","2"], a:"4"}, {q:"The Sun is a ?", o:["planet","star","moon","rock"], a:"star"}, {q:"Plural of 'cat'?", o:["cats","cat","cates","cati"], a:"cats"} ],
-  2: [ {q:"5 × 6 = ?", o:["30","35","25","20"], a:"30"}, {q:"Past tense of 'run'?", o:["ran","runned","running","run"], a:"ran"}, {q:"Synonym of 'happy'?", o:["sad","angry","joyful","tired"], a:"joyful"}, {q:"Antonym of 'cold'?", o:["hot","cool","warm","ice"], a:"hot"}, {q:"√36 = ?", o:["6","7","5","8"], a:"6"} ],
-  3: [ {q:"12 ÷ 4 = ?", o:["2","3","4","6"], a:"3"}, {q:"Chemical symbol for Oxygen?", o:["O","Ox","H","C"], a:"O"}, {q:"Past tense of 'go'?", o:["goed","went","gone","going"], a:"went"}, {q:"12² = ?", o:["124","144","154","164"], a:"144"}, {q:"Synonym of 'quick'?", o:["fast","slow","lazy","weak"], a:"fast"} ],
-  4: [ {q:"Solve: 3x + 5 = 20, x = ?", o:["5","3","10","15"], a:"5"}, {q:"Atomic number of Carbon?", o:["6","12","8","14"], a:"6"}, {q:"Largest planet in Solar System?", o:["Jupiter","Earth","Saturn","Mars"], a:"Jupiter"}, {q:"Antonym of 'obscure'?", o:["clear","dark","hidden","vague"], a:"clear"}, {q:"√169 = ?", o:["12","13","14","15"], a:"13"} ],
-  5: [ {q:"Solve: 5x - 7 = 18, x = ?", o:["5","3","7","4"], a:"5"}, {q:"Atomic number of Oxygen?", o:["8","16","6","12"], a:"8"}, {q:"Speed of light (km/s)?", o:["300,000","30,000","300","3,000"], a:"300,000"}, {q:"Factor: x² - 9", o:["(x+3)(x-3)","(x+9)(x-1)","(x-3)²","(x+1)(x-9)"], a:"(x+3)(x-3)"}, {q:"Past participle of 'write'?", o:["wrote","written","writing","writed"], a:"written"} ]
+  1: [ {q:"2 + 2 = ?", o:["3","4","5","6"], a:"4"}, {q:"Water freezes at ?", o:["0°C","10°C","100°C","50°C"], a:"0°C"} ],
+  2: [ {q:"5 × 6 = ?", o:["30","35","25","20"], a:"30"}, {q:"Past tense of 'run'?", o:["ran","runned","running","run"], a:"ran"} ],
+  3: [ {q:"12 ÷ 4 = ?", o:["2","3","4","6"], a:"3"}, {q:"Chemical symbol for Oxygen?", o:["O","Ox","H","C"], a:"O"} ],
+  4: [ {q:"Solve: 3x + 5 = 20, x = ?", o:["5","3","10","15"], a:"5"}, {q:"Largest planet?", o:["Jupiter","Earth","Saturn","Mars"], a:"Jupiter"} ],
+  5: [ {q:"Solve: 5x - 7 = 18, x = ?", o:["5","3","7","4"], a:"5"}, {q:"Speed of light (km/s)?", o:["300,000","30,000","300","3,000"], a:"300,000"} ]
 };
  
 // Sounds
@@ -105,14 +107,14 @@ function startGame(){
   prepareLevel(); loadQuestion();
 }
  
-// Prepare questions for current level
+// Prepare level
 function prepareLevel(){
   questions = levels[level].sort(()=>Math.random()-0.5);
   index = 0; score = {1:0,2:0};
   updateProgress();
 }
  
-// Load a question
+// Load question
 function loadQuestion(){
   clearInterval(timer);
   if(index >= questions.length){ nextLevel(); return; }
@@ -164,39 +166,49 @@ function updateProgress(){ document.getElementById("levelProgress").style.width=
 // Next level
 function nextLevel(){ levelScores.push({1:score[1],2:score[2]}); if(level<5){ level++; prepareLevel(); alert("Level "+level+" unlocked!"); loadQuestion();} else finish(); }
  
-// Finish game
+// Finish game with full purple leaderboard
 function finish(){
-  // Add last level's score
-  levelScores.push({1:score[1],2:score[2]});
-  
-  document.getElementById("quiz").style.display="none";
-  document.getElementById("end").style.display="block";
-  
-  let total1=0,total2=0,tbody="";
-  for(let i=0;i<levelScores.length;i++){
-    tbody+="<tr><td>"+(i+1)+"</td><td>"+levelScores[i][1]+"</td><td>"+levelScores[i][2]+"</td></tr>";
-    total1+=levelScores[i][1];
-    total2+=levelScores[i][2];
+  if(levelScores.length < 5){
+      levelScores.push({1:score[1],2:score[2]});
   }
-  
-  document.getElementById("leaderboardBody").innerHTML=tbody;
-  document.getElementById("total1").textContent=total1;
-  document.getElementById("total2").textContent=total2;
-  document.getElementById("th1").textContent=p1;
-  document.getElementById("th2").textContent=p2;
  
-  // Highlight winner
-  document.getElementById("total1").style.color = total1 >= total2 ? "#0f0" : "#fff";
-  document.getElementById("total2").style.color = total2 >= total1 ? "#0f0" : "#fff";
+  document.getElementById("quiz").style.display="none"; 
+  document.getElementById("end").style.display="block";
+ 
+  let total1=0, total2=0;
+  let tbody="";
+ 
+  for(let i=0; i<levelScores.length; i++){
+      let s1 = levelScores[i][1];
+      let s2 = levelScores[i][2];
+      total1 += s1;
+      total2 += s2;
+ 
+      tbody += "<tr>"+
+               "<td>Level "+(i+1)+"</td>"+
+               "<td>"+s1+"</td>"+
+               "<td>"+s2+"</td>"+
+               "</tr>";
+  }
+ 
+  document.getElementById("leaderboardBody").innerHTML = tbody;
+ 
+  document.getElementById("total1").textContent = total1;
+  document.getElementById("total2").textContent = total2;
+ 
+  document.getElementById("th1").textContent = p1;
+  document.getElementById("th2").textContent = p2;
  
   let winner="";
-  if(total1>total2) winner=p1+" wins!";
-  else if(total2>total1) winner=p2+" wins!";
-  else winner="It's a tie!";
-  
-  document.getElementById("result").textContent="Final Result: "+winner;
+  if(total1>total2) winner = p1+" wins!";
+  else if(total2>total1) winner = p2+" wins!";
+  else winner = "It's a tie!";
+ 
+  document.getElementById("result").textContent = "Final Result: "+winner;
 }
 </script>
  
 </body>
 </html>
+ 
+
