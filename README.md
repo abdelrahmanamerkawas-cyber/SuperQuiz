@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SuperQuiz 1v1 Progressive Levels</title>
+<title> NEURA </title>
 <style>
 body { font-family: Arial; text-align: center; background: #46178f; color: white; overflow-x:hidden; }
 .box { width: 520px; margin: 20px auto; background: #2b0a57; padding: 20px; border-radius: 12px; position: relative; }
@@ -30,12 +30,10 @@ tfoot { background: #7b3de1; font-weight: bold; } /* Footer for totals */
 </head>
 <body>
  
-<!-- Sounds -->
-<audio id="correctSound" src="https://freesound.org/data/previews/320/320181_5260877-lq.mp3"></audio>
-<audio id="wrongSound" src="https://freesound.org/data/previews/256/256113_4486188-lq.mp3"></audio>
+
  
 <div class="box" id="start">
-<h2>SuperQuiz 1v1 vs Bot</h2>
+<h2> Neura </h2>
 <input id="player1" placeholder="Player 1 Name"><br><br>
 <input id="player2" placeholder="Player 2 Name (leave blank for Bot)"><br><br>
 <select id="botDifficulty">
